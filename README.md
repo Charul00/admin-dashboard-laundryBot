@@ -59,8 +59,15 @@ Uses the same Supabase project as the Telegram bot. Tables used:
 - **Dashboard shows no data**  
   Ensure `.env.local` uses the **same** Supabase project (same URL and service key) as where you ran the migrations and where the Telegram bot points.
 
-## Deploy (e.g. Vercel)
+## Deploy to Vercel
 
-1. Push to GitHub and import the repo in Vercel.
-2. Set env vars: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_KEY`.
-3. Deploy. For production, add auth (e.g. Supabase Auth or a simple password) so only the owner can access.
+1. Push the dashboard to GitHub: [admin-dashboard-laundryBot](https://github.com/Charul00/admin-dashboard-laundryBot).
+2. In [Vercel](https://vercel.com), **Add New… → Project** and import that repo.
+3. Add **Environment Variables** (same as local):
+   - `NEXT_PUBLIC_SUPABASE_URL` – your Supabase project URL (same as Telegram bot).
+   - `SUPABASE_SERVICE_KEY` – Supabase **service_role** key (keep secret).
+4. Click **Deploy**. Vercel will build and give you a URL (e.g. `https://admin-dashboard-laundry-bot.vercel.app`).
+
+Full steps: **[docs/DEPLOY_VERCEL.md](docs/DEPLOY_VERCEL.md)**.
+
+For production, add auth (e.g. Supabase Auth or a simple password) so only the owner can access.
