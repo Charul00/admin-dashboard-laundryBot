@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LaundryOps Admin Dashboard
 
-## Getting Started
+Owner dashboard for LaundryOps: track outlets, staff, orders, and analytics. Uses the same Supabase database as the Telegram bot.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Overview**: KPIs (orders, revenue, customers, outlets, express count, feedback), line chart (orders & revenue last 7 days), pie chart (orders by status), bar chart (orders & revenue by outlet), recent orders table.
+- **Outlets**: List all outlets with orders count, revenue, and delivered count per outlet.
+- **Orders**: Table of recent orders with customer, outlet, status, priority, total, payment, date.
+- **Staff**: List staff by outlet (requires `staff` table in Supabase).
+- **Feedback**: Average rating, total responses, table of feedback with order, rating, category, comment.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Environment**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   Copy `.env.local.example` to `.env.local` and set:
 
-## Learn More
+   - `NEXT_PUBLIC_SUPABASE_URL` – your Supabase project URL (same as telegram-bot).
+   - `SUPABASE_SERVICE_KEY` – Supabase **service_role** key (same as telegram-bot). Keep this secret.
 
-To learn more about Next.js, take a look at the following resources:
+2. **Run**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   Open [http://localhost:3000](http://localhost:3000).
 
-## Deploy on Vercel
+## Bot and dashboard in sync
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The dashboard and Telegram bot **share the same Supabase project** (same URL and service key in `.env.local` for the dashboard and `.env` for the bot). So:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Bookings** created via the bot appear in the dashboard (Orders, Overview).
+- **Outlet maintenance** (Set to maintenance / Activate) in the dashboard is respected by the bot: the bot will not assign maintenance outlets and will tell the customer.
+- **Staff** added or deactivated in the dashboard is the same data the bot’s backend uses.
+- **Feedback** (ratings) given in the bot after a booking appear in the dashboard (Feedback page).
+
+Use the **same** Supabase project for both; otherwise data will not match.
+
+## Database
+
+Uses the same Supabase project as the Telegram bot. Tables used:
+
+- `outlets`, `orders`, `customers`, `feedback`, `services`
+- Optional: `staff` (if present, Staff page shows data; otherwise shows a short note).
+
+## Troubleshooting
+
+- **Only 3 outlets showing**  
+  Run `telegram-bot/supabase_migrations/007_outlets_one_per_area.sql` in Supabase → SQL Editor. It creates one outlet per area (Kothrud, FC Road, Kondhwa, etc.). Refresh the dashboard.
+
+- **Staff page empty or “No staff records”**  
+  1. Click **Staff** in the left sidebar (between Orders and Feedback).  
+  2. Run `telegram-bot/supabase_migrations/008_staff_table_and_seed.sql` in Supabase → SQL Editor to create the `staff` table and seed one manager + one washer per outlet.  
+  3. Refresh the Staff page.
+
+- **Dashboard shows no data**  
+  Ensure `.env.local` uses the **same** Supabase project (same URL and service key) as where you ran the migrations and where the Telegram bot points.
+
+## Deploy (e.g. Vercel)
+
+1. Push to GitHub and import the repo in Vercel.
+2. Set env vars: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_KEY`.
+3. Deploy. For production, add auth (e.g. Supabase Auth or a simple password) so only the owner can access.
