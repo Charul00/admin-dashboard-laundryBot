@@ -1,7 +1,7 @@
 import { unstable_noStore } from "next/cache";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { addStaff, setStaffActiveForm, updateStaffForm } from "./actions";
+import { addStaff, setStaffActiveForm } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -25,16 +25,24 @@ async function getStaff(
     if (error) return { staff: [], total: 0, totalPages: 1, error: error.message };
 
     const raw = data ?? [];
-    const staff = raw.map((row: Record<string, unknown>) => ({
-      id: row.id,
-      full_name: row.full_name ?? row.fullname ?? "—",
-      role: row.role ?? "—",
-      outlet_id: row.outlet_id ?? null,
-      phone_number: row.phone_number ?? null,
+    type StaffRow = {
+      id: string;
+      full_name: string;
+      role: string;
+      outlet_id: string | null;
+      phone_number: string | null;
+      is_active: boolean;
+    };
+    const staff: StaffRow[] = raw.map((row: Record<string, unknown>) => ({
+      id: String(row.id ?? ""),
+      full_name: String(row.full_name ?? row.fullname ?? "—"),
+      role: String(row.role ?? "—"),
+      outlet_id: row.outlet_id != null ? String(row.outlet_id) : null,
+      phone_number: row.phone_number != null ? String(row.phone_number) : null,
       is_active: row.is_active !== false,
     }));
 
-    const outletIds = Array.from(new Set(staff.map((s) => s.outlet_id).filter(Boolean) as string[]));
+    const outletIds = Array.from(new Set(staff.map((s) => s.outlet_id).filter(Boolean))) as string[];
     const outletMap: Record<string, string> = {};
     if (outletIds.length > 0) {
       const { data: outlets } = await supabase
@@ -46,7 +54,10 @@ async function getStaff(
     const total = count ?? 0;
     const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
     return {
-      staff: staff.map((s) => ({ ...s, outlet_name: s.outlet_id ? outletMap[s.outlet_id] : "—" })),
+      staff: staff.map((s) => ({
+        ...s,
+        outlet_name: s.outlet_id ? (outletMap[s.outlet_id] ?? "—") : "—",
+      })),
       total,
       totalPages,
       error: null,
