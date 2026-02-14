@@ -17,13 +17,32 @@ export function hashPassword(password: string): string {
   return createHash("sha256").update(password, "utf8").digest("hex");
 }
 
+/** Base64url encode (works in Node and Edge; no Buffer in Edge). */
+function base64urlEncode(str: string): string {
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(str, "utf8").toString("base64url");
+  }
+  const base64 = btoa(unescape(encodeURIComponent(str)));
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+/** Base64url decode (works in Node and Edge). */
+function base64urlDecode(value: string): string {
+  const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64 + "==".slice(0, (4 - (base64.length % 4)) % 4);
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(padded, "base64").toString("utf8");
+  }
+  return decodeURIComponent(escape(atob(padded)));
+}
+
 export function encodeSession(session: Session): string {
-  return Buffer.from(JSON.stringify(session), "utf8").toString("base64url");
+  return base64urlEncode(JSON.stringify(session));
 }
 
 export function decodeSession(value: string): Session | null {
   try {
-    const json = Buffer.from(value, "base64url").toString("utf8");
+    const json = base64urlDecode(value);
     const s = JSON.parse(json) as Session;
     if (s.role !== "owner" && s.role !== "manager") return null;
     return s;

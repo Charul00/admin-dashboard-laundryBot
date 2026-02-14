@@ -20,8 +20,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
-  const outlets = session?.role === "owner" ? await getOutlets() : [];
+  let session: Awaited<ReturnType<typeof getSession>> = null;
+  let outlets: Awaited<ReturnType<typeof getOutlets>> = [];
+  try {
+    session = await getSession();
+    if (session?.role === "owner") {
+      outlets = await getOutlets();
+    }
+  } catch {
+    session = null;
+    outlets = [];
+  }
   return (
     <html lang="en">
       <body className="min-h-screen antialiased bg-slate-900">
