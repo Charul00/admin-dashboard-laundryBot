@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { getSession, getEffectiveOutletId } from "@/lib/auth";
-import { updateOrderStatus } from "./actions";
+import { OrderStatusSelect } from "@/components/OrderStatusSelect";
 
 const PAGE_SIZE = 10;
-const ORDER_STATUSES = ["Received", "In Progress", "Ready", "Out for Delivery", "Delivered", "Cancelled"];
 
 async function getOrders(
   supabase: NonNullable<typeof import("@/lib/supabase").supabase>,
@@ -121,19 +120,7 @@ export default async function OrdersPage({
                     <td className="py-3 px-4">{o.customer_name}</td>
                     <td className="py-3 px-4">{o.outlet_name}</td>
                     <td className="py-3 px-4">
-                      <form action={updateOrderStatus} className="inline">
-                        <input type="hidden" name="orderId" value={o.id} />
-                        <select
-                          name="status"
-                          defaultValue={o.status}
-                          onChange={(e) => e.target.form?.requestSubmit()}
-                          className="rounded bg-slate-700 border border-slate-600 px-2 py-1 text-slate-200 text-sm"
-                        >
-                          {ORDER_STATUSES.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
-                      </form>
+                      <OrderStatusSelect orderId={o.id} currentStatus={o.status} />
                     </td>
                     <td className="py-3 px-4">{o.priority_type}</td>
                     <td className="py-3 px-4 text-right">{Number(o.total_price).toFixed(2)}</td>
