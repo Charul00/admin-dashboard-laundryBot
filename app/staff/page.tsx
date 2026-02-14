@@ -1,6 +1,7 @@
 import { unstable_noStore } from "next/cache";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { getSession, getEffectiveOutletId } from "@/lib/auth";
 import { addStaff, setStaffActiveForm } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -10,17 +11,19 @@ const STAFF_ROLES = ["washer", "ironer", "manager", "delivery"] as const;
 
 async function getStaff(
   supabase: NonNullable<typeof import("@/lib/supabase").supabase>,
-  page: number
+  page: number,
+  outletId: string | null
 ) {
   try {
     const from = (page - 1) * PAGE_SIZE;
     const to = from + PAGE_SIZE - 1;
 
-    const { data, error, count } = await supabase
+    let staffQuery = supabase
       .from("staff")
       .select("*", { count: "exact" })
-      .order("id", { ascending: true })
-      .range(from, to);
+      .order("id", { ascending: true });
+    if (outletId) staffQuery = staffQuery.eq("outlet_id", outletId);
+    const { data, error, count } = await staffQuery.range(from, to);
 
     if (error) return { staff: [], total: 0, totalPages: 1, error: error.message };
 
@@ -67,8 +70,13 @@ async function getStaff(
   }
 }
 
-async function getOutlets(supabase: NonNullable<typeof import("@/lib/supabase").supabase>) {
-  const { data } = await supabase.from("outlets").select("id, outlet_name").order("outlet_name");
+async function getOutlets(
+  supabase: NonNullable<typeof import("@/lib/supabase").supabase>,
+  outletId: string | null
+) {
+  let q = supabase.from("outlets").select("id, outlet_name").order("outlet_name");
+  if (outletId) q = q.eq("id", outletId);
+  const { data } = await q;
   return data ?? [];
 }
 
@@ -88,9 +96,11 @@ export default async function StaffPage({
       </div>
     );
   }
+  const session = await getSession();
+  const outletId = session ? getEffectiveOutletId(session) : null;
   const [{ staff, total, totalPages, error }, outlets] = await Promise.all([
-    getStaff(supabase, page),
-    getOutlets(supabase),
+    getStaff(supabase, page, outletId),
+    getOutlets(supabase, outletId),
   ]);
 
   if (error) {

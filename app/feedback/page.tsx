@@ -1,38 +1,63 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { getSession, getEffectiveOutletId } from "@/lib/auth";
 
 const PAGE_SIZE = 10;
 
 async function getFeedback(
   supabase: NonNullable<typeof import("@/lib/supabase").supabase>,
-  page: number
+  page: number,
+  outletId: string | null
 ) {
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  const { data: feedback, count } = await supabase
+  let orderIds: string[] = [];
+  if (outletId) {
+    const { data: outletOrders } = await supabase
+      .from("orders")
+      .select("id")
+      .eq("outlet_id", outletId);
+    orderIds = (outletOrders ?? []).map((o) => o.id);
+  }
+
+  let feedbackQuery = supabase
     .from("feedback")
     .select("id, order_id, rating, category, comment, created_at", { count: "exact" })
-    .order("id", { ascending: false })
-    .range(from, to);
+    .order("id", { ascending: false });
+  if (outletId && orderIds.length > 0) feedbackQuery = feedbackQuery.in("order_id", orderIds);
+  else if (outletId) {
+    return { list: [], avgRating: 0, total: 0, page, totalPages: 1 };
+  }
+  const { data: feedback, count } = await feedbackQuery.range(from, to);
 
   const total = count ?? 0;
   const list = feedback ?? [];
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const { data: allRatings } = await supabase.from("feedback").select("rating");
-  const all = allRatings ?? [];
-  const avgRating = all.length ? all.reduce((s, f) => s + (f.rating ?? 0), 0) / all.length : 0;
+  let avgRating = 0;
+  if (outletId && orderIds.length > 0) {
+    const { data: allRatings } = await supabase
+      .from("feedback")
+      .select("rating")
+      .in("order_id", orderIds);
+    const all = allRatings ?? [];
+    avgRating = all.length ? all.reduce((s, f) => s + (f.rating ?? 0), 0) / all.length : 0;
+  } else if (!outletId) {
+    const { data: allRatings } = await supabase.from("feedback").select("rating");
+    const all = allRatings ?? [];
+    avgRating = all.length ? all.reduce((s, f) => s + (f.rating ?? 0), 0) / all.length : 0;
+  }
 
   if (list.length === 0) {
     return { list: [], avgRating, total, page, totalPages };
   }
 
-  const orderIds = Array.from(new Set(list.map((f) => f.order_id)));
+  const listOrderIds = Array.from(new Set(list.map((f) => f.order_id)));
   const { data: orders } = await supabase
     .from("orders")
     .select("id, order_number")
-    .in("id", orderIds);
+    .in("id", listOrderIds);
   const orderMap: Record<string, string> = {};
   orders?.forEach((o) => (orderMap[o.id] = o.order_number));
 
@@ -69,9 +94,11 @@ export default async function FeedbackPage({
       </div>
     );
   }
+  const session = await getSession();
+  const outletId = session ? getEffectiveOutletId(session) : null;
   let error: string | null = null;
   try {
-    data = await getFeedback(supabase, page);
+    data = await getFeedback(supabase, page, outletId);
   } catch (e) {
     error = e instanceof Error ? e.message : "Failed to load feedback";
   }

@@ -2,6 +2,7 @@ import { unstable_noStore } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { getSession, getEffectiveOutletId } from "@/lib/auth";
 import { updateStaffForm } from "../../actions";
 
 const STAFF_ROLES = ["washer", "ironer", "manager", "delivery"] as const;
@@ -29,8 +30,13 @@ async function getStaffById(
   };
 }
 
-async function getOutlets(supabase: NonNullable<typeof import("@/lib/supabase").supabase>) {
-  const { data } = await supabase.from("outlets").select("id, outlet_name").order("outlet_name");
+async function getOutlets(
+  supabase: NonNullable<typeof import("@/lib/supabase").supabase>,
+  outletId: string | null
+) {
+  let q = supabase.from("outlets").select("id, outlet_name").order("outlet_name");
+  if (outletId) q = q.eq("id", outletId);
+  const { data } = await q;
   return data ?? [];
 }
 
@@ -41,6 +47,8 @@ export default async function StaffEditPage({
 }) {
   unstable_noStore();
   const { id } = await params;
+  const session = await getSession();
+  const outletId = session ? getEffectiveOutletId(session) : null;
   if (!supabase) {
     return (
       <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
@@ -48,8 +56,9 @@ export default async function StaffEditPage({
       </div>
     );
   }
-  const [staff, outlets] = await Promise.all([getStaffById(supabase, id), getOutlets(supabase)]);
+  const [staff, outlets] = await Promise.all([getStaffById(supabase, id), getOutlets(supabase, outletId)]);
   if (!staff) notFound();
+  if (outletId && staff.outlet_id !== outletId) notFound();
 
   return (
     <div className="space-y-6">

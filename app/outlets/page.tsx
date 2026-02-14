@@ -1,6 +1,7 @@
 import { unstable_noStore } from "next/cache";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { getSession, getEffectiveOutletId } from "@/lib/auth";
 import { setOutletActive } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -26,19 +27,23 @@ type OutletRow = {
 
 async function getOutletsWithStats(
   supabase: NonNullable<typeof import("@/lib/supabase").supabase>,
-  page: number
+  page: number,
+  outletId: string | null
 ): Promise<{ list: OutletRow[]; total: number; totalPages: number }> {
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  const { data: outlets, error: outletsError, count } = await supabase
+  let outletsQuery = supabase
     .from("outlets")
     .select(OUTLETS_SELECT, { count: "exact" })
-    .order("outlet_name")
-    .range(from, to);
+    .order("outlet_name");
+  if (outletId) outletsQuery = outletsQuery.eq("id", outletId);
+  else outletsQuery = outletsQuery.range(from, to);
+  const { data: outletsRaw, error: outletsError, count } = await outletsQuery;
+  const outlets = outletsRaw ?? [];
 
-  const total = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const total = outletId ? outlets.length : (count ?? 0);
+  const totalPages = outletId ? 1 : Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   if (outletsError) {
     const fallbackCols = "id, outlet_name, is_active, city";
@@ -79,7 +84,7 @@ async function getOutletsWithStats(
     };
   }
 
-  const list = outlets ?? [];
+  const list = outlets;
   const { data: orders } = await supabase.from("orders").select("outlet_id, total_price, status");
   const byOutlet: Record<string, { orders: number; revenue: number; delivered: number; running: number }> = {};
   list.forEach((o) => { byOutlet[o.id] = { orders: 0, revenue: 0, delivered: 0, running: 0 }; });
@@ -128,10 +133,12 @@ export default async function OutletsPage({
       </div>
     );
   }
+  const session = await getSession();
+  const outletId = session ? getEffectiveOutletId(session) : null;
   let data: Awaited<ReturnType<typeof getOutletsWithStats>> = { list: [], total: 0, totalPages: 1 };
   let error: string | null = null;
   try {
-    data = await getOutletsWithStats(supabase, page);
+    data = await getOutletsWithStats(supabase, page, outletId);
   } catch (e) {
     error = e instanceof Error ? e.message : "Failed to load outlets";
   }

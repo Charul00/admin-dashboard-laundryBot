@@ -1,20 +1,51 @@
 import { supabase } from "@/lib/supabase";
+import { getSession, getEffectiveOutletId } from "@/lib/auth";
 import { TrendChart, StatusPieChart, OutletBarChart } from "@/components/DashboardCharts";
 
-async function getDashboardData(supabase: NonNullable<typeof import("@/lib/supabase").supabase>) {
-  const [outletsRes, ordersRes, customersRes, feedbackRes, staffRes] = await Promise.all([
-    supabase.from("outlets").select("id, outlet_name, is_active").order("outlet_name"),
-    supabase.from("orders").select("id, order_number, outlet_id, status, total_price, created_at, priority_type"),
-    supabase.from("customers").select("id", { count: "exact", head: true }),
-    supabase.from("feedback").select("id, rating", { count: "exact", head: true }),
-    supabase.from("staff").select("id", { count: "exact", head: true }),
+async function getDashboardData(
+  supabase: NonNullable<typeof import("@/lib/supabase").supabase>,
+  outletId: string | null
+) {
+  let outletsQuery = supabase.from("outlets").select("id, outlet_name, is_active").order("outlet_name");
+  let ordersQuery = supabase.from("orders").select("id, order_number, outlet_id, status, total_price, created_at, priority_type");
+  if (outletId) {
+    outletsQuery = outletsQuery.eq("id", outletId);
+    ordersQuery = ordersQuery.eq("outlet_id", outletId);
+  }
+  const [outletsRes, ordersRes, staffRes] = await Promise.all([
+    outletsQuery,
+    ordersQuery,
+    outletId
+      ? supabase.from("staff").select("id", { count: "exact", head: true }).eq("outlet_id", outletId)
+      : supabase.from("staff").select("id", { count: "exact", head: true }),
   ]);
-
   const outlets = outletsRes.data ?? [];
   const orders = ordersRes.data ?? [];
-  const totalCustomers = customersRes.count ?? 0;
-  const totalFeedback = feedbackRes.count ?? 0;
   const staffCount = staffRes.count ?? 0;
+
+  let totalCustomers: number;
+  let totalFeedback: number;
+  if (outletId) {
+    const orderIds = orders.map((o) => o.id);
+    if (orderIds.length > 0) {
+      const [custRows, fbRes] = await Promise.all([
+        supabase.from("orders").select("customer_id").in("id", orderIds),
+        supabase.from("feedback").select("id", { count: "exact", head: true }).in("order_id", orderIds),
+      ]);
+      totalCustomers = custRows.data ? Array.from(new Set(custRows.data.map((o) => o.customer_id).filter(Boolean))).length : 0;
+      totalFeedback = fbRes.count ?? 0;
+    } else {
+      totalCustomers = 0;
+      totalFeedback = 0;
+    }
+  } else {
+    const [custRes, fbRes] = await Promise.all([
+      supabase.from("customers").select("id", { count: "exact", head: true }),
+      supabase.from("feedback").select("id", { count: "exact", head: true }),
+    ]);
+    totalCustomers = custRes.count ?? 0;
+    totalFeedback = fbRes.count ?? 0;
+  }
 
   const totalRevenue = orders.reduce((s, o) => s + (Number(o.total_price) || 0), 0);
   const ordersByStatus: Record<string, number> = {};
@@ -76,6 +107,8 @@ async function getDashboardData(supabase: NonNullable<typeof import("@/lib/supab
 }
 
 export default async function DashboardPage() {
+  const session = await getSession();
+  const outletId = session ? getEffectiveOutletId(session) : null;
   if (!supabase) {
     return (
       <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
@@ -87,7 +120,7 @@ export default async function DashboardPage() {
   let data: Awaited<ReturnType<typeof getDashboardData>>;
   let error: string | null = null;
   try {
-    data = await getDashboardData(supabase);
+    data = await getDashboardData(supabase, outletId);
   } catch (e) {
     error = e instanceof Error ? e.message : "Failed to load dashboard";
     data = {

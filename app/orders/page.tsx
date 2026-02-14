@@ -1,24 +1,31 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { getSession, getEffectiveOutletId } from "@/lib/auth";
+import { updateOrderStatus } from "./actions";
 
 const PAGE_SIZE = 10;
+const ORDER_STATUSES = ["Received", "In Progress", "Ready", "Out for Delivery", "Delivered", "Cancelled"];
 
 async function getOrders(
   supabase: NonNullable<typeof import("@/lib/supabase").supabase>,
-  page: number
+  page: number,
+  outletId: string | null
 ) {
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
+  let ordersQuery = supabase
+    .from("orders")
+    .select(
+      "id, order_number, customer_id, outlet_id, status, priority_type, total_price, payment_status, created_at",
+      { count: "exact" }
+    )
+    .order("created_at", { ascending: false })
+    .range(from, to);
+  if (outletId) ordersQuery = ordersQuery.eq("outlet_id", outletId);
+
   const [{ data: orders, count }, outletsRes, customersRes] = await Promise.all([
-    supabase
-      .from("orders")
-      .select(
-        "id, order_number, customer_id, outlet_id, status, priority_type, total_price, payment_status, created_at",
-        { count: "exact" }
-      )
-      .order("created_at", { ascending: false })
-      .range(from, to),
+    ordersQuery,
     supabase.from("outlets").select("id, outlet_name"),
     supabase.from("customers").select("id, full_name"),
   ]);
@@ -61,8 +68,10 @@ export default async function OrdersPage({
     totalPages: 1,
   };
   let error: string | null = null;
+  const session = await getSession();
+  const outletId = session ? getEffectiveOutletId(session) : null;
   try {
-    data = await getOrders(supabase, page);
+    data = await getOrders(supabase, page, outletId);
   } catch (e) {
     error = e instanceof Error ? e.message : "Failed to load orders";
   }
@@ -112,7 +121,19 @@ export default async function OrdersPage({
                     <td className="py-3 px-4">{o.customer_name}</td>
                     <td className="py-3 px-4">{o.outlet_name}</td>
                     <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded bg-slate-700 text-slate-300">{o.status}</span>
+                      <form action={updateOrderStatus} className="inline">
+                        <input type="hidden" name="orderId" value={o.id} />
+                        <select
+                          name="status"
+                          defaultValue={o.status}
+                          onChange={(e) => e.target.form?.requestSubmit()}
+                          className="rounded bg-slate-700 border border-slate-600 px-2 py-1 text-slate-200 text-sm"
+                        >
+                          {ORDER_STATUSES.map((s) => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                      </form>
                     </td>
                     <td className="py-3 px-4">{o.priority_type}</td>
                     <td className="py-3 px-4 text-right">{Number(o.total_price).toFixed(2)}</td>

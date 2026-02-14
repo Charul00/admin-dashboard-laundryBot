@@ -1,14 +1,24 @@
 # LaundryOps Admin Dashboard
 
-Owner dashboard for LaundryOps: track outlets, staff, orders, and analytics. Uses the same Supabase database as the Telegram bot.
+Owner and Manager dashboard for LaundryOps: track outlets, staff, orders, and analytics. Uses the same Supabase database as the Telegram bot.
+
+## Login (Owner & Manager)
+
+- **Owner login**: Sees all outlets; can select an outlet in the sidebar to view that outlet’s data only. CRUD (update status, activate/maintenance outlet, staff) is scoped to the selected outlet (or all when “All outlets” is selected).
+- **Manager login**: During login, select **Manager** and choose an **outlet**. Manager sees only that outlet’s data and can perform CRUD for that outlet (orders status, outlet maintenance, staff).
+
+**Default credentials (run migration first):**
+
+- Owner: `owner@laundryops.com` / `owner123`
+- Manager: `manager@laundryops.com` + select outlet / `manager123`
 
 ## Features
 
-- **Overview**: KPIs (orders, revenue, customers, outlets, express count, feedback), line chart (orders & revenue last 7 days), pie chart (orders by status), bar chart (orders & revenue by outlet), recent orders table.
-- **Outlets**: List all outlets with orders count, revenue, and delivered count per outlet.
-- **Orders**: Table of recent orders with customer, outlet, status, priority, total, payment, date.
-- **Staff**: List staff by outlet (requires `staff` table in Supabase).
-- **Feedback**: Average rating, total responses, table of feedback with order, rating, category, comment.
+- **Overview**: KPIs (orders, revenue, customers, outlets, express count, feedback), line chart (orders & revenue last 7 days), pie chart (orders by status), bar chart (orders & revenue by outlet), recent orders table. Scoped by selected outlet (owner) or manager’s outlet.
+- **Outlets**: List outlets (one for manager; all or selected for owner) with orders count, revenue, delivered count, monitoring. Toggle outlet active/maintenance.
+- **Orders**: Table of orders with customer, outlet, status, priority, total, payment, date. **Update order status** via dropdown (Received, In Progress, Ready, Out for Delivery, Delivered, Cancelled). Scoped by outlet.
+- **Staff**: List and add staff; activate/deactivate; edit. Scoped by outlet.
+- **Feedback**: Average rating and list; scoped by outlet.
 
 ## Setup
 
@@ -45,6 +55,7 @@ Uses the same Supabase project as the Telegram bot. Tables used:
 
 - `outlets`, `orders`, `customers`, `feedback`, `services`
 - Optional: `staff` (if present, Staff page shows data; otherwise shows a short note).
+- **Login**: `dashboard_users` (run `telegram-bot/supabase_migrations/011_dashboard_users.sql` in Supabase → SQL Editor to create the table and seed one owner + one manager per outlet).
 
 ## Troubleshooting
 
@@ -70,4 +81,4 @@ Uses the same Supabase project as the Telegram bot. Tables used:
 
 Full steps: **[docs/DEPLOY_VERCEL.md](docs/DEPLOY_VERCEL.md)**.
 
-For production, add auth (e.g. Supabase Auth or a simple password) so only the owner can access.
+Login is already in place (owner/manager with outlet scope). For production, use stronger passwords and consider bcrypt instead of the dev SHA-256 hashing.

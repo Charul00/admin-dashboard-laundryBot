@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
+import { getSession, getEffectiveOutletId } from "@/lib/auth";
 
 const STAFF_ROLES = ["washer", "ironer", "manager", "delivery"] as const;
 
@@ -12,8 +13,18 @@ function getSupabase() {
   return createClient(url, key);
 }
 
+async function assertStaffInScope(supabase: ReturnType<typeof getSupabase>, staffId: string) {
+  const session = await getSession();
+  if (!session) throw new Error("Unauthorized");
+  const outletId = getEffectiveOutletId(session);
+  if (!outletId) return;
+  const { data } = await supabase.from("staff").select("outlet_id").eq("id", staffId).single();
+  if (!data || data.outlet_id !== outletId) throw new Error("Staff not in your outlet");
+}
+
 export async function setStaffActive(staffId: string, isActive: boolean) {
   const supabase = getSupabase();
+  await assertStaffInScope(supabase, staffId);
   const { error } = await supabase
     .from("staff")
     .update({ is_active: isActive })
@@ -28,6 +39,12 @@ async function updateStaff(
   data: { full_name?: string; role?: string; outlet_id?: string | null; phone_number?: string | null }
 ) {
   const supabase = getSupabase();
+  await assertStaffInScope(supabase, staffId);
+  const session = await getSession();
+  const outletId = session ? getEffectiveOutletId(session) : null;
+  if (outletId && data.outlet_id !== undefined && data.outlet_id !== outletId) {
+    throw new Error("You can only assign staff to your outlet");
+  }
   if (data.role && !STAFF_ROLES.includes(data.role as (typeof STAFF_ROLES)[number])) {
     throw new Error("Role must be one of: washer, ironer, manager, delivery");
   }
@@ -46,12 +63,15 @@ async function updateStaff(
 export async function addStaff(formData: FormData) {
   const full_name = (formData.get("full_name") as string)?.trim();
   const role = (formData.get("role") as string)?.trim();
-  const outlet_id = (formData.get("outlet_id") as string) || null;
+  let outlet_id = (formData.get("outlet_id") as string) || null;
   const phone_number = (formData.get("phone_number") as string)?.trim() || null;
   if (!full_name) throw new Error("Name is required");
   if (!role || !STAFF_ROLES.includes(role as (typeof STAFF_ROLES)[number])) {
     throw new Error("Role must be one of: washer, ironer, manager, delivery");
   }
+  const session = await getSession();
+  const scopeOutletId = session ? getEffectiveOutletId(session) : null;
+  if (scopeOutletId) outlet_id = scopeOutletId;
   const supabase = getSupabase();
   const { error } = await supabase.from("staff").insert({
     full_name,
