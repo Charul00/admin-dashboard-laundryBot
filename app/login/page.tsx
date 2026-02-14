@@ -30,6 +30,13 @@ export default async function LoginPage() {
           {" · "}
           Manager: <code className="bg-slate-700 px-1 rounded">manager@laundryops.com</code> + outlet / <code className="bg-slate-700 px-1 rounded">manager123</code>
         </p>
+        <p className="mt-2 text-xs text-slate-400">
+          Don&apos;t have an account?{" "}
+          <a href="/register" className="text-sky-400 hover:underline">
+            Register here
+          </a>
+          {" "}— wait until we approve your request to sign in.
+        </p>
       </div>
     </div>
   );

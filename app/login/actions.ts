@@ -31,7 +31,7 @@ export async function login(_prevState: LoginResult, formData: FormData): Promis
   if (role === "owner") {
     const { data, error } = await supabase
       .from("dashboard_users")
-      .select("id, email")
+      .select("id, email, status")
       .eq("email", email)
       .eq("role", "owner")
       .is("outlet_id", null)
@@ -39,6 +39,9 @@ export async function login(_prevState: LoginResult, formData: FormData): Promis
 
     if (error || !data) {
       return { error: "Invalid email or password." };
+    }
+    if ((data.status || "approved") !== "approved") {
+      return { error: "Your registration is pending. Please wait until we approve your request." };
     }
     const { data: row } = await supabase
       .from("dashboard_users")
@@ -66,7 +69,7 @@ export async function login(_prevState: LoginResult, formData: FormData): Promis
 
   const { data: user, error } = await supabase
     .from("dashboard_users")
-    .select("id, email, outlet_id, outlets(outlet_name)")
+    .select("id, email, outlet_id, status, outlets(outlet_name)")
     .eq("email", email)
     .eq("role", "manager")
     .eq("outlet_id", outletId)
@@ -74,6 +77,9 @@ export async function login(_prevState: LoginResult, formData: FormData): Promis
 
   if (error || !user) {
     return { error: "Invalid email, outlet or password." };
+  }
+  if ((user.status || "approved") !== "approved") {
+    return { error: "Your registration is pending. Please wait until we approve your request." };
   }
 
   const { data: pwdRow } = await supabase

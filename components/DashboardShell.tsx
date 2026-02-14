@@ -18,7 +18,7 @@ export function DashboardShell({
   outlets: OutletOption[];
 }) {
   const pathname = usePathname();
-  if (pathname === "/login") {
+  if (pathname === "/login" || pathname === "/register") {
     return <>{children}</>;
   }
 
@@ -88,6 +88,14 @@ export function DashboardShell({
           >
             Feedback
           </Link>
+          {session?.role === "owner" && (
+            <Link
+              href="/pending-requests"
+              className={`block px-3 py-2 rounded-lg mb-1 ${pathname === "/pending-requests" ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700 hover:text-white"}`}
+            >
+              Pending requests
+            </Link>
+          )}
         </nav>
 
         <div className="p-2 border-t border-slate-700">

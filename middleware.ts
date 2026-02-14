@@ -5,7 +5,7 @@ const SESSION_COOKIE = "laundryops_session";
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  if (path.startsWith("/login")) {
+  if (path.startsWith("/login") || path.startsWith("/register")) {
     return NextResponse.next();
   }
   const session = request.cookies.get(SESSION_COOKIE)?.value;
@@ -17,5 +17,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/outlets", "/orders", "/staff", "/staff/:path*", "/feedback"],
+  matcher: ["/", "/outlets", "/orders", "/staff", "/staff/:path*", "/feedback", "/pending-requests"],
 };
