@@ -92,7 +92,7 @@ export default async function StaffPage({
   if (!supabase) {
     return (
       <div className="card-surface border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
-        <p>Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
+        <p>Service temporarily unavailable. Please try again later.</p>
       </div>
     );
   }
@@ -108,12 +108,7 @@ export default async function StaffPage({
       <div className="space-y-6">
         <h1 className="text-2xl font-bold text-[var(--foreground)]">Staff</h1>
         <div className="card-surface border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
-          <p>Staff table may not exist in your database.</p>
-          <p className="text-sm mt-1">{error}</p>
-          <p className="text-sm mt-2">
-            To track staff, add a <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">staff</code> table in Supabase with
-            columns: id, full_name, role, outlet_id (optional), phone_number, is_active.
-          </p>
+          <p>Could not load staff. Please try again later.</p>
         </div>
       </div>
     );
@@ -161,13 +156,8 @@ export default async function StaffPage({
       </div>
 
       {staff.length === 0 && (
-        <div className="card-surface p-4 text-slate-300 space-y-2">
-          <p>No staff in this project. Check Supabase:</p>
-          <ul className="list-disc list-inside text-sm text-[var(--muted)]">
-            <li>Table Editor → <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">staff</code> — confirm this is the same project as in .env.local (Overview shows its staff count).</li>
-            <li>Run <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">008_staff_table_and_seed.sql</code> in this project’s SQL Editor to create the staff table and seed data.</li>
-            <li>If RLS is enabled on <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">staff</code>, add a policy that allows <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">service_role</code> to SELECT, or disable RLS for this table.</li>
-          </ul>
+        <div className="card-surface p-4 text-slate-300">
+          <p>No staff found.</p>
         </div>
       )}
       <div className="card-surface overflow-hidden">

@@ -52,7 +52,7 @@ export default async function StaffEditPage({
   if (!supabase) {
     return (
       <div className="card-surface border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
-        <p>Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
+        <p>Service temporarily unavailable. Please try again later.</p>
       </div>
     );
   }

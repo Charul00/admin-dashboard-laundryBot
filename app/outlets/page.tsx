@@ -129,7 +129,7 @@ export default async function OutletsPage({
   if (!supabase) {
     return (
       <div className="card-surface border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
-        <p>Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
+        <p>Service temporarily unavailable. Please try again later.</p>
       </div>
     );
   }
@@ -146,7 +146,7 @@ export default async function OutletsPage({
   if (error) {
     return (
       <div className="card-surface border-red-500/40 bg-red-500/10 p-4 text-red-200">
-        <p>{error}</p>
+        <p>Could not load outlets. Please try again later.</p>
       </div>
     );
   }
@@ -160,26 +160,10 @@ export default async function OutletsPage({
         <strong className="text-slate-200">{total}</strong> outlet{total !== 1 ? "s" : ""} total · Page {page} of {totalPages}.
         Each card shows orders, revenue, delivered, and monitoring (electricity, detergent, orders running).
       </p>
-      {outlets.length > 0 && outlets.some((o) => o.electricity_usage_kwh == null && o.detergent_usage_kg == null) && (
-        <p className="text-amber-300/90 text-sm card-surface border-amber-500/40 bg-amber-500/10 px-4 py-2">
-          Electricity/detergent showing —? Run the full <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">009_outlet_monitoring.sql</code> in Supabase SQL Editor (same project as .env.local). Then in Table Editor → outlets confirm columns <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">electricity_usage_kwh</code> and <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">detergent_usage_kg</code> exist and have numbers. Hard-refresh (Cmd+Shift+R) after.
-        </p>
-      )}
       {outlets.length === 0 && (
-        <div className="card-surface p-4 text-slate-300 space-y-2">
-          <p>No outlets in this project. Check Supabase:</p>
-          <ul className="list-disc list-inside text-sm text-[var(--muted)]">
-            <li>Table Editor → <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">outlets</code> — confirm this is the same project as in .env.local (Overview shows its outlet count).</li>
-            <li>Run <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">007_outlets_one_per_area.sql</code> in this project’s SQL Editor to create one outlet per area.</li>
-            <li>If RLS is enabled on <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">outlets</code>, add a policy that allows <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">service_role</code> to SELECT, or disable RLS for this table.</li>
-          </ul>
+        <div className="card-surface p-4 text-slate-300">
+          <p>No outlets found.</p>
         </div>
-      )}
-      {total > 0 && total <= 3 && (
-        <p className="text-amber-300/90 text-sm card-surface border-amber-500/40 bg-amber-500/10 px-4 py-2">
-          Only {total} outlet(s)? Run <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">007_outlets_one_per_area.sql</code> in
-          Supabase SQL Editor to add one outlet per area (Kothrud, FC Road, Kondhwa, Viman Nagar, etc.).
-        </p>
       )}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {outlets.length === 0 ? null : (

@@ -112,8 +112,8 @@ export default async function DashboardPage() {
   if (!supabase) {
     return (
       <div className="card-surface rounded-2xl border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
-        <p className="font-medium">Configure environment</p>
-        <p className="text-sm mt-1">Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
+        <p className="font-medium">Service temporarily unavailable</p>
+        <p className="text-sm mt-1">Please try again later.</p>
       </div>
     );
   }
@@ -143,8 +143,7 @@ export default async function DashboardPage() {
     return (
       <div className="card-surface rounded-2xl border-red-500/40 bg-red-500/10 p-4 text-red-200">
         <p className="font-medium">Cannot load dashboard</p>
-        <p className="text-sm mt-1">{error}</p>
-        <p className="text-sm mt-2">Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
+        <p className="text-sm mt-1">Please try again later.</p>
       </div>
     );
   }
@@ -158,32 +157,9 @@ export default async function DashboardPage() {
     { label: "Feedback", value: data.totalFeedback },
   ];
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-  let projectHint = "not set";
-  try {
-    if (supabaseUrl) projectHint = new URL(supabaseUrl).hostname;
-  } catch {
-    projectHint = "invalid URL";
-  }
-
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold text-[var(--foreground)]">Overview</h1>
-
-      <div className="card-surface px-5 py-4 text-sm text-slate-300">
-        <span className="font-medium text-[var(--accent)]">Connected to:</span> {projectHint}
-        {" · "}
-        <span className="font-medium text-slate-200">Outlets:</span> {data.outletsCount}
-        {" · "}
-        <span className="font-medium text-slate-200">Staff:</span> {data.staffCount}
-        {data.outletsCount <= 3 || data.staffCount === 0 ? (
-          <p className="mt-2 text-amber-300/90">
-            If numbers are low, run <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">007_outlets_one_per_area.sql</code> and{" "}
-            <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">008_staff_table_and_seed.sql</code> in{" "}
-            <strong>this project’s</strong> Supabase SQL Editor (same project as the URL above).
-          </p>
-        ) : null}
-      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpis.map((k) => (
