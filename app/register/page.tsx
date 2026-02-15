@@ -18,16 +18,18 @@ export default async function RegisterPage() {
   const outlets = await getOutlets();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-slate-800 border border-slate-700 p-8 shadow-xl">
-        <h1 className="text-2xl font-bold text-sky-400 mb-1">Request access</h1>
-        <p className="text-slate-400 text-sm mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--background)] p-4 relative z-10">
+      <div className="card-surface-accent w-full max-w-md p-8">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] bg-clip-text text-transparent mb-1">
+          Request access
+        </h1>
+        <p className="text-[var(--muted)] text-sm mb-6">
           Register as Owner or Manager. Your request will be reviewed — you can log in after approval.
         </p>
         <RegisterForm outlets={outlets} />
-        <p className="mt-4 text-xs text-slate-500">
+        <p className="mt-4 text-xs text-[var(--muted)]">
           Already have an account?{" "}
-          <a href="/login" className="text-sky-400 hover:underline">
+          <a href="/login" className="text-[var(--accent)] hover:underline font-medium">
             Sign in
           </a>
         </p>

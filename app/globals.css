@@ -1,16 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #0f172a;
+  --background: #0c0f1a;
+  --background-soft: #111827;
+  --card: #151b28;
+  --card-hover: #1a2235;
+  --border: #2d3748;
+  --border-accent: rgba(45, 212, 191, 0.35);
   --foreground: #f1f5f9;
-  --card: #1e293b;
   --muted: #64748b;
-  --accent: #38bdf8;
+  --accent: #2dd4bf;
+  --accent-hover: #14b8a6;
+  --accent-glow: rgba(45, 212, 191, 0.15);
+  --accent-secondary: #a78bfa;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --error: #f87171;
+  --radius: 0.75rem;
+  --radius-lg: 1rem;
+  --shadow-card: 0 4px 24px -4px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 32px -8px rgba(45, 212, 191, 0.25);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Subtle gradient overlay on main background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(45, 212, 191, 0.08), transparent),
+              radial-gradient(ellipse 60% 40% at 100% 50%, rgba(167, 139, 250, 0.06), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card style utility */
+@layer components {
+  .card-surface {
+    @apply rounded-2xl border bg-[var(--card)] border-[var(--border)];
+    box-shadow: var(--shadow-card);
+  }
+  .card-surface-accent {
+    @apply rounded-2xl border bg-[var(--card)] border-[var(--border-accent)];
+    box-shadow: var(--shadow-card), var(--shadow-glow);
+  }
+  .btn-accent {
+    @apply rounded-xl font-semibold transition-all duration-200;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    box-shadow: 0 4px 14px -2px rgba(45, 212, 191, 0.4);
+  }
+  .btn-accent:hover {
+    box-shadow: 0 6px 20px -2px rgba(45, 212, 191, 0.5);
+    transform: translateY(-1px);
+  }
+  .input-field {
+    @apply rounded-xl border bg-[var(--card)] px-4 py-2.5 text-[var(--foreground)] placeholder-[var(--muted)] transition-all duration-200;
+    border-color: var(--border);
+  }
+  .input-field:focus {
+    @apply outline-none ring-2;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .nav-link {
+    @apply block rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200;
+  }
+  .nav-link-active {
+    background: linear-gradient(135deg, rgba(45, 212, 191, 0.2) 0%, rgba(45, 212, 191, 0.08) 100%);
+    color: var(--accent);
+    border: 1px solid var(--border-accent);
+  }
+  .nav-link-inactive {
+    color: #94a3b8;
+  }
+  .nav-link-inactive:hover {
+    background: rgba(45, 212, 191, 0.08);
+    color: var(--foreground);
+  }
 }

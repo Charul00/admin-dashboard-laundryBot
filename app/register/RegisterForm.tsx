@@ -33,7 +33,7 @@ export function RegisterForm({ outlets }: { outlets: Outlet[] }) {
 
   if (state?.success) {
     return (
-      <div className="rounded-lg bg-emerald-900/30 border border-emerald-600/50 px-3 py-2 text-emerald-200 text-sm">
+      <div className="rounded-xl bg-[var(--success)]/15 border border-[var(--success)]/40 px-3 py-2 text-emerald-300 text-sm">
         Registration submitted. Redirecting to login…
       </div>
     );
@@ -45,11 +45,11 @@ export function RegisterForm({ outlets }: { outlets: Outlet[] }) {
         <label className="block text-sm font-medium text-slate-300 mb-2">Register as</label>
         <div className="flex gap-4">
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="role" value="owner" defaultChecked className="rounded border-slate-600 bg-slate-700 text-sky-500" />
+            <input type="radio" name="role" value="owner" defaultChecked className="rounded border-[var(--border)] bg-[var(--card)] text-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]" />
             <span className="text-slate-200">Owner</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="role" value="manager" className="rounded border-slate-600 bg-slate-700 text-sky-500" />
+            <input type="radio" name="role" value="manager" className="rounded border-[var(--border)] bg-[var(--card)] text-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]" />
             <span className="text-slate-200">Manager</span>
           </label>
         </div>
@@ -57,11 +57,7 @@ export function RegisterForm({ outlets }: { outlets: Outlet[] }) {
 
       <div ref={outletFieldRef} className="hidden">
         <label className="block text-sm font-medium text-slate-300 mb-1">Outlet</label>
-        <select
-          ref={outletSelectRef}
-          name="outlet_id"
-          className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 text-sm"
-        >
+        <select ref={outletSelectRef} name="outlet_id" className="input-field w-full text-sm">
           <option value="">— Select outlet —</option>
           {outlets.map((o) => (
             <option key={o.id} value={o.id}>{o.outlet_name}</option>
@@ -71,40 +67,24 @@ export function RegisterForm({ outlets }: { outlets: Outlet[] }) {
 
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-1">Email</label>
-        <input
-          type="email"
-          name="email"
-          required
-          placeholder="you@example.com"
-          className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 placeholder-slate-500 text-sm"
-        />
+        <input type="email" name="email" required placeholder="you@example.com" className="input-field w-full text-sm" />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-slate-300 mb-1">Password (min 6 characters)</label>
-        <input
-          type="password"
-          name="password"
-          required
-          minLength={6}
-          placeholder="••••••••"
-          className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 placeholder-slate-500 text-sm"
-        />
+        <input type="password" name="password" required minLength={6} placeholder="••••••••" className="input-field w-full text-sm" />
       </div>
 
       {state?.error && (
-        <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 px-3 py-2 text-amber-200 text-sm">
+        <div className="rounded-xl bg-red-500/10 border border-red-500/40 px-3 py-2 text-red-300 text-sm">
           {state.error}
         </div>
       )}
 
-      <button
-        type="submit"
-        className="w-full rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium py-2.5 text-sm"
-      >
+      <button type="submit" className="btn-accent w-full text-white font-medium py-3 text-sm">
         Submit request
       </button>
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-[var(--muted)]">
         Your request will be reviewed. You can log in after we approve it. Check your email or try logging in later.
       </p>
     </form>

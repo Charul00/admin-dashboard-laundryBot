@@ -111,7 +111,7 @@ export default async function DashboardPage() {
   const outletId = session ? getEffectiveOutletId(session) : null;
   if (!supabase) {
     return (
-      <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
+      <div className="card-surface rounded-2xl border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
         <p className="font-medium">Configure environment</p>
         <p className="text-sm mt-1">Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
       </div>
@@ -141,7 +141,7 @@ export default async function DashboardPage() {
 
   if (error) {
     return (
-      <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
+      <div className="card-surface rounded-2xl border-red-500/40 bg-red-500/10 p-4 text-red-200">
         <p className="font-medium">Cannot load dashboard</p>
         <p className="text-sm mt-1">{error}</p>
         <p className="text-sm mt-2">Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
@@ -168,18 +168,18 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold text-slate-100">Overview</h1>
+      <h1 className="text-2xl font-bold text-[var(--foreground)]">Overview</h1>
 
-      <div className="rounded-lg bg-slate-800/80 border border-slate-600 px-4 py-3 text-sm text-slate-300">
-        <span className="font-medium text-slate-200">Connected to:</span> {projectHint}
+      <div className="card-surface px-5 py-4 text-sm text-slate-300">
+        <span className="font-medium text-[var(--accent)]">Connected to:</span> {projectHint}
         {" · "}
         <span className="font-medium text-slate-200">Outlets:</span> {data.outletsCount}
         {" · "}
         <span className="font-medium text-slate-200">Staff:</span> {data.staffCount}
         {data.outletsCount <= 3 || data.staffCount === 0 ? (
-          <p className="mt-2 text-amber-200/90">
-            If numbers are low, run <code className="bg-slate-700 px-1 rounded">007_outlets_one_per_area.sql</code> and{" "}
-            <code className="bg-slate-700 px-1 rounded">008_staff_table_and_seed.sql</code> in{" "}
+          <p className="mt-2 text-amber-300/90">
+            If numbers are low, run <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">007_outlets_one_per_area.sql</code> and{" "}
+            <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">008_staff_table_and_seed.sql</code> in{" "}
             <strong>this project’s</strong> Supabase SQL Editor (same project as the URL above).
           </p>
         ) : null}
@@ -189,67 +189,66 @@ export default async function DashboardPage() {
         {kpis.map((k) => (
           <div
             key={k.label}
-            className="rounded-xl bg-slate-800 border border-slate-700 p-4"
+            className="card-surface p-5 hover:border-[var(--border-accent)] transition-colors"
           >
-            <p className="text-slate-400 text-sm">{k.label}</p>
-            <p className="text-xl font-semibold text-sky-400 mt-1">{k.value}</p>
+            <p className="text-[var(--muted)] text-sm font-medium">{k.label}</p>
+            <p className="text-xl font-bold text-[var(--accent)] mt-1">{k.value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
+        <div className="card-surface p-5">
           <h2 className="font-semibold text-slate-200 mb-4">Orders & Revenue (last 7 days)</h2>
           <TrendChart data={data.trendData} />
         </div>
-
-        <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
+        <div className="card-surface p-5">
           <h2 className="font-semibold text-slate-200 mb-4">Orders by status</h2>
           <StatusPieChart data={data.statusChart} />
         </div>
       </div>
 
-      <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
+      <div className="card-surface p-5">
         <h2 className="font-semibold text-slate-200 mb-4">Orders & Revenue by outlet</h2>
         <OutletBarChart data={data.ordersByOutletChart} />
       </div>
 
-      <div className="rounded-xl bg-slate-800 border border-slate-700 p-4">
+      <div className="card-surface p-5">
         <h2 className="font-semibold text-slate-200 mb-4">Recent orders</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-slate-400 border-b border-slate-600">
-                <th className="text-left py-2">Order #</th>
-                <th className="text-left py-2">Status</th>
-                <th className="text-left py-2">Priority</th>
-                <th className="text-right py-2">Total (₹)</th>
-                <th className="text-left py-2">Date</th>
+              <tr className="text-[var(--muted)] border-b border-[var(--border)]">
+                <th className="text-left py-3">Order #</th>
+                <th className="text-left py-3">Status</th>
+                <th className="text-left py-3">Priority</th>
+                <th className="text-right py-3">Total (₹)</th>
+                <th className="text-left py-3">Date</th>
               </tr>
             </thead>
             <tbody>
               {data.recentOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-4 text-slate-500 text-center">
+                  <td colSpan={5} className="py-6 text-[var(--muted)] text-center">
                     No orders yet
                   </td>
                 </tr>
               ) : (
                 data.recentOrders.map((o) => (
-                  <tr key={o.id} className="border-b border-slate-700/50">
-                    <td className="py-2 font-mono text-sky-400">{o.order_number}</td>
-                    <td className="py-2">{o.status}</td>
-                    <td className="py-2">{o.priority_type}</td>
-                    <td className="py-2 text-right">{Number(o.total_price).toFixed(2)}</td>
-                    <td className="py-2 text-slate-400">{o.created_at?.slice(0, 10)}</td>
+                  <tr key={o.id} className="border-b border-[var(--border)]/50 hover:bg-[var(--card-hover)]/50 transition-colors">
+                    <td className="py-3 font-mono text-[var(--accent)]">{o.order_number}</td>
+                    <td className="py-3">{o.status}</td>
+                    <td className="py-3">{o.priority_type}</td>
+                    <td className="py-3 text-right">{Number(o.total_price).toFixed(2)}</td>
+                    <td className="py-3 text-[var(--muted)]">{o.created_at?.slice(0, 10)}</td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
         </div>
-        <div className="mt-3">
-          <a href="/orders" className="text-sky-400 hover:underline text-sm">
+        <div className="mt-4">
+          <a href="/orders" className="text-[var(--accent)] hover:underline text-sm font-medium">
             View all orders →
           </a>
         </div>

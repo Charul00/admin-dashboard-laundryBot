@@ -30,19 +30,19 @@ export default async function PendingRequestsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-100">Pending requests</h1>
-      <p className="text-slate-400 text-sm">
+      <h1 className="text-2xl font-bold text-[var(--foreground)]">Pending requests</h1>
+      <p className="text-[var(--muted)] text-sm">
         Approve or reject registration requests. Approved users can log in.
       </p>
       {list.length === 0 ? (
-        <div className="rounded-xl bg-slate-800 border border-slate-700 p-6 text-slate-400 text-center">
+        <div className="card-surface p-8 text-[var(--muted)] text-center">
           No pending requests.
         </div>
       ) : (
-        <div className="rounded-xl bg-slate-800 border border-slate-700 overflow-hidden">
+        <div className="card-surface overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-slate-400 border-b border-slate-600 bg-slate-800/80">
+              <tr className="text-[var(--muted)] border-b border-[var(--border)] bg-[var(--card-hover)]/50">
                 <th className="text-left py-3 px-4">Email</th>
                 <th className="text-left py-3 px-4">Role</th>
                 <th className="text-left py-3 px-4">Outlet</th>

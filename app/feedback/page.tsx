@@ -89,7 +89,7 @@ export default async function FeedbackPage({
   };
   if (!supabase) {
     return (
-      <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
+      <div className="card-surface border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
         <p>Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
       </div>
     );
@@ -105,7 +105,7 @@ export default async function FeedbackPage({
 
   if (error) {
     return (
-      <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
+      <div className="card-surface border-red-500/40 bg-red-500/10 p-4 text-red-200">
         <p>{error}</p>
       </div>
     );
@@ -115,27 +115,27 @@ export default async function FeedbackPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-100">Feedback</h1>
+      <h1 className="text-2xl font-bold text-[var(--foreground)]">Feedback</h1>
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl bg-slate-800 border border-slate-700 p-5">
-          <p className="text-slate-400 text-sm">Average rating</p>
-          <p className="text-3xl font-bold text-amber-400 mt-1">
+        <div className="card-surface p-5 hover:border-[var(--border-accent)] transition-colors">
+          <p className="text-[var(--muted)] text-sm font-medium">Average rating</p>
+          <p className="text-3xl font-bold text-[var(--warning)] mt-1">
             {data.avgRating.toFixed(1)} / 5
           </p>
         </div>
-        <div className="rounded-xl bg-slate-800 border border-slate-700 p-5">
-          <p className="text-slate-400 text-sm">Total responses</p>
-          <p className="text-3xl font-bold text-sky-400 mt-1">{data.total}</p>
+        <div className="card-surface p-5 hover:border-[var(--border-accent)] transition-colors">
+          <p className="text-[var(--muted)] text-sm font-medium">Total responses</p>
+          <p className="text-3xl font-bold text-[var(--accent)] mt-1">{data.total}</p>
         </div>
       </div>
-      <p className="text-slate-400 text-sm">
+      <p className="text-[var(--muted)] text-sm">
         Page {data.page} of {totalPages} · {data.total} total
       </p>
-      <div className="rounded-xl bg-slate-800 border border-slate-700 overflow-hidden">
+      <div className="card-surface overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-slate-400 border-b border-slate-600 bg-slate-800/80">
+              <tr className="text-[var(--muted)] border-b border-[var(--border)] bg-[var(--card-hover)]/50">
                 <th className="text-left py-3 px-4">Order</th>
                 <th className="text-left py-3 px-4">Rating</th>
                 <th className="text-left py-3 px-4">Category</th>
@@ -146,20 +146,20 @@ export default async function FeedbackPage({
             <tbody>
               {data.list.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-8 text-slate-500 text-center">
+                  <td colSpan={5} className="py-8 text-[var(--muted)] text-center">
                     No feedback yet
                   </td>
                 </tr>
               ) : (
                 data.list.map((f) => (
-                  <tr key={f.id} className="border-b border-slate-700/50">
-                    <td className="py-3 px-4 font-mono text-sky-400">{f.order_number}</td>
+                  <tr key={f.id} className="border-b border-[var(--border)]/50 hover:bg-[var(--card-hover)]/50 transition-colors">
+                    <td className="py-3 px-4 font-mono text-[var(--accent)]">{f.order_number}</td>
                     <td className="py-3 px-4">
-                      <span className="text-amber-400">{f.rating} ★</span>
+                      <span className="text-[var(--warning)]">{f.rating} ★</span>
                     </td>
                     <td className="py-3 px-4">{f.category ?? "—"}</td>
                     <td className="py-3 px-4 max-w-xs truncate">{f.comment ?? "—"}</td>
-                    <td className="py-3 px-4 text-slate-400">{f.created_at?.slice(0, 10)}</td>
+                    <td className="py-3 px-4 text-[var(--muted)]">{f.created_at?.slice(0, 10)}</td>
                   </tr>
                 ))
               )}
@@ -169,20 +169,20 @@ export default async function FeedbackPage({
       </div>
       {totalPages > 1 && (
         <nav className="flex items-center justify-between gap-4 flex-wrap">
-          <span className="text-slate-400 text-sm">
+          <span className="text-[var(--muted)] text-sm">
             Page {data.page} of {totalPages}
           </span>
           <div className="flex gap-2">
             <Link
               href={data.page <= 1 ? "/feedback" : `/feedback?page=${data.page - 1}`}
-              className="rounded-lg bg-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600 disabled:opacity-50 disabled:pointer-events-none"
+              className="rounded-xl bg-[var(--card-hover)] border border-[var(--border)] px-4 py-2 text-sm text-slate-200 hover:border-[var(--border-accent)] hover:bg-[var(--accent-glow)] transition-colors disabled:opacity-50 disabled:pointer-events-none"
               aria-disabled={data.page <= 1}
             >
               Previous
             </Link>
             <Link
               href={data.page >= totalPages ? `/feedback?page=${totalPages}` : `/feedback?page=${data.page + 1}`}
-              className="rounded-lg bg-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600 disabled:opacity-50 disabled:pointer-events-none"
+              className="rounded-xl bg-[var(--card-hover)] border border-[var(--border)] px-4 py-2 text-sm text-slate-200 hover:border-[var(--border-accent)] hover:bg-[var(--accent-glow)] transition-colors disabled:opacity-50 disabled:pointer-events-none"
               aria-disabled={data.page >= totalPages}
             >
               Next

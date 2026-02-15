@@ -22,31 +22,36 @@ export function DashboardShell({
     return <>{children}</>;
   }
 
+  const navClass = (path: string) =>
+    pathname === path ? "nav-link nav-link-active" : "nav-link nav-link-inactive";
+
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-56 bg-slate-800 border-r border-slate-700 flex flex-col">
-        <div className="p-4 border-b border-slate-700">
-          <h1 className="font-bold text-lg text-sky-400">LaundryOps</h1>
-          <p className="text-xs text-slate-400">
+    <div className="flex min-h-screen relative z-10">
+      <aside className="w-60 flex-shrink-0 flex flex-col border-r border-[var(--border)] bg-[var(--card)]/80 backdrop-blur-sm">
+        <div className="p-5 border-b border-[var(--border)]">
+          <h1 className="font-bold text-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] bg-clip-text text-transparent">
+            LaundryOps
+          </h1>
+          <p className="text-xs text-[var(--muted)] mt-0.5">
             {session?.role === "owner" ? "Owner" : "Manager"} Dashboard
           </p>
           {session?.outletName && (
-            <p className="text-xs text-slate-300 mt-1 truncate" title={session.outletName}>
+            <p className="text-xs text-slate-400 mt-1 truncate" title={session.outletName}>
               {session.outletName}
             </p>
           )}
         </div>
 
         {session?.role === "owner" && outlets.length > 0 && (
-          <div className="p-2 border-b border-slate-700">
-            <form action={setSelectedOutlet} className="space-y-1">
+          <div className="p-3 border-b border-[var(--border)]">
+            <form action={setSelectedOutlet} className="space-y-2">
               <input type="hidden" name="redirect" value={pathname || "/"} />
-              <label className="block text-xs text-slate-400 mb-1">View outlet</label>
+              <label className="block text-xs font-medium text-[var(--muted)]">View outlet</label>
               <select
                 name="outlet_id"
                 defaultValue={session.selectedOutletId ?? ""}
                 onChange={(e) => e.target.form?.requestSubmit()}
-                className="w-full rounded bg-slate-700 border border-slate-600 px-2 py-1.5 text-slate-200 text-sm"
+                className="input-field w-full text-sm py-2"
               >
                 <option value="">All outlets</option>
                 {outlets.map((o) => (
@@ -57,59 +62,31 @@ export function DashboardShell({
           </div>
         )}
 
-        <nav className="flex-1 p-2">
-          <Link
-            href="/"
-            className={`block px-3 py-2 rounded-lg mb-1 ${pathname === "/" ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700 hover:text-white"}`}
-          >
-            Overview
-          </Link>
-          <Link
-            href="/outlets"
-            className={`block px-3 py-2 rounded-lg mb-1 ${pathname === "/outlets" ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700 hover:text-white"}`}
-          >
-            Outlets
-          </Link>
-          <Link
-            href="/orders"
-            className={`block px-3 py-2 rounded-lg mb-1 ${pathname === "/orders" ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700 hover:text-white"}`}
-          >
-            Orders
-          </Link>
-          <Link
-            href="/staff"
-            className={`block px-3 py-2 rounded-lg mb-1 ${pathname === "/staff" ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700 hover:text-white"}`}
-          >
-            Staff
-          </Link>
-          <Link
-            href="/feedback"
-            className={`block px-3 py-2 rounded-lg mb-1 ${pathname === "/feedback" ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700 hover:text-white"}`}
-          >
-            Feedback
-          </Link>
+        <nav className="flex-1 p-3 space-y-0.5">
+          <Link href="/" className={navClass("/")}>Overview</Link>
+          <Link href="/outlets" className={navClass("/outlets")}>Outlets</Link>
+          <Link href="/orders" className={navClass("/orders")}>Orders</Link>
+          <Link href="/staff" className={navClass("/staff")}>Staff</Link>
+          <Link href="/feedback" className={navClass("/feedback")}>Feedback</Link>
           {session?.role === "owner" && (
-            <Link
-              href="/pending-requests"
-              className={`block px-3 py-2 rounded-lg mb-1 ${pathname === "/pending-requests" ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700 hover:text-white"}`}
-            >
+            <Link href="/pending-requests" className={navClass("/pending-requests")}>
               Pending requests
             </Link>
           )}
         </nav>
 
-        <div className="p-2 border-t border-slate-700">
+        <div className="p-3 border-t border-[var(--border)]">
           <form action={logout}>
             <button
               type="submit"
-              className="w-full text-left px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-700 hover:text-white text-sm"
+              className="nav-link w-full text-left text-[var(--muted)] hover:text-[var(--error)] hover:bg-red-500/10"
             >
               Logout
             </button>
           </form>
         </div>
       </aside>
-      <main className="flex-1 overflow-auto p-6">{children}</main>
+      <main className="flex-1 overflow-auto p-6 bg-transparent">{children}</main>
     </div>
   );
 }

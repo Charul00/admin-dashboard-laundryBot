@@ -17,7 +17,7 @@ export function OrderStatusSelect({ orderId, currentStatus }: Props) {
         name="status"
         defaultValue={currentStatus}
         onChange={(e) => e.currentTarget.form?.requestSubmit()}
-        className="rounded bg-slate-700 border border-slate-600 px-2 py-1 text-slate-200 text-sm"
+        className="input-field px-2 py-1.5 text-sm min-w-[8rem]"
       >
         {ORDER_STATUSES.map((s) => (
           <option key={s} value={s}>

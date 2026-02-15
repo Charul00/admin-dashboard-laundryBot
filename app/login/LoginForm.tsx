@@ -29,11 +29,11 @@ export function LoginForm({ outlets }: { outlets: Outlet[] }) {
         <label className="block text-sm font-medium text-slate-300 mb-2">Login as</label>
         <div className="flex gap-4">
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="role" value="owner" defaultChecked className="rounded border-slate-600 bg-slate-700 text-sky-500" />
+            <input type="radio" name="role" value="owner" defaultChecked className="rounded border-[var(--border)] bg-[var(--card)] text-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]" />
             <span className="text-slate-200">Owner</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="role" value="manager" className="rounded border-slate-600 bg-slate-700 text-sky-500" />
+            <input type="radio" name="role" value="manager" className="rounded border-[var(--border)] bg-[var(--card)] text-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]" />
             <span className="text-slate-200">Manager</span>
           </label>
         </div>
@@ -41,11 +41,7 @@ export function LoginForm({ outlets }: { outlets: Outlet[] }) {
 
       <div ref={outletFieldRef} className="hidden">
         <label className="block text-sm font-medium text-slate-300 mb-1">Outlet</label>
-        <select
-          ref={outletSelectRef}
-          name="outlet_id"
-          className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 text-sm"
-        >
+        <select ref={outletSelectRef} name="outlet_id" className="input-field w-full text-sm">
           <option value="">— Select outlet —</option>
           {outlets.map((o) => (
             <option key={o.id} value={o.id}>{o.outlet_name}</option>
@@ -60,7 +56,7 @@ export function LoginForm({ outlets }: { outlets: Outlet[] }) {
           name="email"
           required
           placeholder="owner@laundryops.com"
-          className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 placeholder-slate-500 text-sm"
+          className="input-field w-full text-sm"
         />
       </div>
 
@@ -71,20 +67,17 @@ export function LoginForm({ outlets }: { outlets: Outlet[] }) {
           name="password"
           required
           placeholder="••••••••"
-          className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 placeholder-slate-500 text-sm"
+          className="input-field w-full text-sm"
         />
       </div>
 
       {state?.error && (
-        <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 px-3 py-2 text-amber-200 text-sm">
+        <div className="rounded-xl bg-red-500/10 border border-red-500/40 px-3 py-2 text-red-300 text-sm">
           {state.error}
         </div>
       )}
 
-      <button
-        type="submit"
-        className="w-full rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium py-2.5 text-sm"
-      >
+      <button type="submit" className="btn-accent w-full text-white font-medium py-3 text-sm">
         Sign in
       </button>
     </form>

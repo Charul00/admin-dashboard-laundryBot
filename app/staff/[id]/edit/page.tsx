@@ -51,7 +51,7 @@ export default async function StaffEditPage({
   const outletId = session ? getEffectiveOutletId(session) : null;
   if (!supabase) {
     return (
-      <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
+      <div className="card-surface border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
         <p>Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
       </div>
     );
@@ -63,77 +63,47 @@ export default async function StaffEditPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/staff" className="text-slate-400 hover:text-slate-200 text-sm">
+        <Link href="/staff" className="text-[var(--muted)] hover:text-[var(--accent)] text-sm font-medium transition-colors">
           ← Back to staff
         </Link>
       </div>
-      <h1 className="text-2xl font-bold text-slate-100">Edit staff</h1>
-      <p className="text-slate-400 text-sm">
+      <h1 className="text-2xl font-bold text-[var(--foreground)]">Edit staff</h1>
+      <p className="text-[var(--muted)] text-sm">
         Update name, role, outlet assignment, or phone.
       </p>
-      <div className="rounded-xl bg-slate-800 border border-slate-700 p-5 max-w-xl">
+      <div className="card-surface p-5 max-w-xl">
         <form action={updateStaffForm} className="space-y-4">
           <input type="hidden" name="staffId" value={staff.id} />
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Name</label>
-            <input
-              type="text"
-              name="full_name"
-              defaultValue={staff.full_name}
-              required
-              className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 text-sm"
-            />
+            <label className="block text-xs text-[var(--muted)] mb-1">Name</label>
+            <input type="text" name="full_name" defaultValue={staff.full_name} required className="input-field w-full text-sm" />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Role</label>
-            <select
-              name="role"
-              defaultValue={staff.role}
-              required
-              className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 text-sm"
-            >
+            <label className="block text-xs text-[var(--muted)] mb-1">Role</label>
+            <select name="role" defaultValue={staff.role} required className="input-field w-full text-sm">
               {STAFF_ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
+                <option key={r} value={r}>{r}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Outlet</label>
-            <select
-              name="outlet_id"
-              defaultValue={staff.outlet_id ?? ""}
-              className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 text-sm"
-            >
+            <label className="block text-xs text-[var(--muted)] mb-1">Outlet</label>
+            <select name="outlet_id" defaultValue={staff.outlet_id ?? ""} className="input-field w-full text-sm">
               <option value="">— No outlet —</option>
               {outlets.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.outlet_name}
-                </option>
+                <option key={o.id} value={o.id}>{o.outlet_name}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Phone</label>
-            <input
-              type="text"
-              name="phone_number"
-              defaultValue={staff.phone_number ?? ""}
-              className="w-full rounded-lg bg-slate-700 border border-slate-600 px-3 py-2 text-slate-200 text-sm"
-            />
+            <label className="block text-xs text-[var(--muted)] mb-1">Phone</label>
+            <input type="text" name="phone_number" defaultValue={staff.phone_number ?? ""} className="input-field w-full text-sm" />
           </div>
           <div className="flex gap-3">
-            <button
-              type="submit"
-              className="rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 text-sm font-medium"
-            >
+            <button type="submit" className="rounded-xl bg-[var(--success)]/20 hover:bg-[var(--success)]/30 border border-[var(--success)]/40 text-emerald-300 px-4 py-2.5 text-sm font-semibold transition-colors">
               Save changes
             </button>
-            <Link
-              href="/staff"
-              className="rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 text-sm font-medium"
-            >
+            <Link href="/staff" className="rounded-xl bg-[var(--card-hover)] border border-[var(--border)] hover:border-[var(--border-accent)] text-slate-200 px-4 py-2.5 text-sm font-medium transition-colors">
               Cancel
             </Link>
           </div>

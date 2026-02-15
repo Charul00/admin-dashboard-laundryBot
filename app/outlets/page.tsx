@@ -128,7 +128,7 @@ export default async function OutletsPage({
 
   if (!supabase) {
     return (
-      <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
+      <div className="card-surface border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
         <p>Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
       </div>
     );
@@ -145,7 +145,7 @@ export default async function OutletsPage({
 
   if (error) {
     return (
-      <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
+      <div className="card-surface border-red-500/40 bg-red-500/10 p-4 text-red-200">
         <p>{error}</p>
       </div>
     );
@@ -155,44 +155,44 @@ export default async function OutletsPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-100">Outlets</h1>
-      <p className="text-slate-400 text-sm">
+      <h1 className="text-2xl font-bold text-[var(--foreground)]">Outlets</h1>
+      <p className="text-[var(--muted)] text-sm">
         <strong className="text-slate-200">{total}</strong> outlet{total !== 1 ? "s" : ""} total · Page {page} of {totalPages}.
         Each card shows orders, revenue, delivered, and monitoring (electricity, detergent, orders running).
       </p>
       {outlets.length > 0 && outlets.some((o) => o.electricity_usage_kwh == null && o.detergent_usage_kg == null) && (
-        <p className="text-amber-200/90 text-sm rounded-lg bg-amber-900/20 border border-amber-700/40 px-4 py-2">
-          Electricity/detergent showing —? Run the full <code className="bg-slate-800 px-1 rounded">009_outlet_monitoring.sql</code> in Supabase SQL Editor (same project as .env.local). Then in Table Editor → outlets confirm columns <code className="bg-slate-700 px-1 rounded">electricity_usage_kwh</code> and <code className="bg-slate-700 px-1 rounded">detergent_usage_kg</code> exist and have numbers. Hard-refresh (Cmd+Shift+R) after.
+        <p className="text-amber-300/90 text-sm card-surface border-amber-500/40 bg-amber-500/10 px-4 py-2">
+          Electricity/detergent showing —? Run the full <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">009_outlet_monitoring.sql</code> in Supabase SQL Editor (same project as .env.local). Then in Table Editor → outlets confirm columns <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">electricity_usage_kwh</code> and <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">detergent_usage_kg</code> exist and have numbers. Hard-refresh (Cmd+Shift+R) after.
         </p>
       )}
       {outlets.length === 0 && (
-        <div className="rounded-lg bg-slate-800/80 border border-slate-600 p-4 text-slate-300 space-y-2">
+        <div className="card-surface p-4 text-slate-300 space-y-2">
           <p>No outlets in this project. Check Supabase:</p>
-          <ul className="list-disc list-inside text-sm text-slate-400">
-            <li>Table Editor → <code className="bg-slate-700 px-1 rounded">outlets</code> — confirm this is the same project as in .env.local (Overview shows its outlet count).</li>
-            <li>Run <code className="bg-slate-700 px-1 rounded">007_outlets_one_per_area.sql</code> in this project’s SQL Editor to create one outlet per area.</li>
-            <li>If RLS is enabled on <code className="bg-slate-700 px-1 rounded">outlets</code>, add a policy that allows <code className="bg-slate-700 px-1 rounded">service_role</code> to SELECT, or disable RLS for this table.</li>
+          <ul className="list-disc list-inside text-sm text-[var(--muted)]">
+            <li>Table Editor → <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">outlets</code> — confirm this is the same project as in .env.local (Overview shows its outlet count).</li>
+            <li>Run <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">007_outlets_one_per_area.sql</code> in this project’s SQL Editor to create one outlet per area.</li>
+            <li>If RLS is enabled on <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">outlets</code>, add a policy that allows <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded">service_role</code> to SELECT, or disable RLS for this table.</li>
           </ul>
         </div>
       )}
       {total > 0 && total <= 3 && (
-        <p className="text-amber-200/90 text-sm rounded-lg bg-amber-900/20 border border-amber-700/40 px-4 py-2">
-          Only {total} outlet(s)? Run <code className="bg-slate-800 px-1 rounded">007_outlets_one_per_area.sql</code> in
+        <p className="text-amber-300/90 text-sm card-surface border-amber-500/40 bg-amber-500/10 px-4 py-2">
+          Only {total} outlet(s)? Run <code className="bg-[var(--card-hover)] px-1.5 py-0.5 rounded text-[var(--accent)]">007_outlets_one_per_area.sql</code> in
           Supabase SQL Editor to add one outlet per area (Kothrud, FC Road, Kondhwa, Viman Nagar, etc.).
         </p>
       )}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {outlets.length === 0 ? null : (
           outlets.map((o) => (
-            <div key={o.id} className="rounded-xl bg-slate-800 border border-slate-700 p-5">
+            <div key={o.id} className="card-surface p-5 hover:border-[var(--border-accent)] transition-colors">
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="font-semibold text-slate-100">{o.outlet_name}</h2>
-                  {o.city && <p className="text-sm text-slate-400">{o.city}</p>}
+                  <h2 className="font-semibold text-[var(--foreground)]">{o.outlet_name}</h2>
+                  {o.city && <p className="text-sm text-[var(--muted)]">{o.city}</p>}
                 </div>
                 <span
-                  className={`text-xs px-2 py-1 rounded ${
-                    o.is_active ? "bg-emerald-900/50 text-emerald-400" : "bg-amber-900/50 text-amber-400"
+                  className={`text-xs px-2.5 py-1 rounded-xl font-medium ${
+                    o.is_active ? "bg-[var(--success)]/20 text-emerald-400 border border-[var(--success)]/40" : "bg-amber-500/20 text-amber-400 border border-amber-500/40"
                   }`}
                 >
                   {o.is_active ? "Active" : "Maintenance"}
@@ -203,10 +203,10 @@ export default async function OutletsPage({
                 <input type="hidden" name="isActive" value={String(!o.is_active)} />
                 <button
                   type="submit"
-                  className={`text-xs px-3 py-1.5 rounded border ${
+                  className={`text-xs px-3 py-1.5 rounded-xl border font-medium transition-colors ${
                     o.is_active
-                      ? "border-amber-600 text-amber-400 hover:bg-amber-900/30"
-                      : "border-emerald-600 text-emerald-400 hover:bg-emerald-900/30"
+                      ? "border-amber-500/40 text-amber-400 hover:bg-amber-500/20"
+                      : "border-[var(--success)]/40 text-emerald-400 hover:bg-[var(--success)]/20"
                   }`}
                 >
                   {o.is_active ? "Set to maintenance" : "Activate outlet"}
@@ -214,36 +214,36 @@ export default async function OutletsPage({
               </form>
               <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <p className="text-2xl font-semibold text-sky-400">{o.orders}</p>
-                  <p className="text-xs text-slate-500">Orders</p>
+                  <p className="text-2xl font-bold text-[var(--accent)]">{o.orders}</p>
+                  <p className="text-xs text-[var(--muted)]">Orders</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-semibold text-emerald-400">₹{(o.revenue / 1000).toFixed(1)}k</p>
-                  <p className="text-xs text-slate-500">Revenue</p>
+                  <p className="text-2xl font-bold text-[var(--success)]">₹{(o.revenue / 1000).toFixed(1)}k</p>
+                  <p className="text-xs text-[var(--muted)]">Revenue</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-semibold text-slate-300">{o.delivered}</p>
-                  <p className="text-xs text-slate-500">Delivered</p>
+                  <p className="text-2xl font-bold text-slate-300">{o.delivered}</p>
+                  <p className="text-xs text-[var(--muted)]">Delivered</p>
                 </div>
               </div>
-              <div className="mt-4 pt-4 border-t border-slate-600">
-                <p className="text-xs font-medium text-slate-400 mb-2 uppercase tracking-wide">Monitoring</p>
+              <div className="mt-4 pt-4 border-t border-[var(--border)]">
+                <p className="text-xs font-medium text-[var(--muted)] mb-2 uppercase tracking-wide">Monitoring</p>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div>
                     <p className="text-lg font-semibold text-amber-400">
                       {o.electricity_usage_kwh != null ? o.electricity_usage_kwh.toLocaleString() : "—"}
                     </p>
-                    <p className="text-xs text-slate-500">Electricity (kWh)</p>
+                    <p className="text-xs text-[var(--muted)]">Electricity (kWh)</p>
                   </div>
                   <div>
                     <p className="text-lg font-semibold text-violet-400">
                       {o.detergent_usage_kg != null ? o.detergent_usage_kg.toLocaleString() : "—"}
                     </p>
-                    <p className="text-xs text-slate-500">Detergent (kg)</p>
+                    <p className="text-xs text-[var(--muted)]">Detergent (kg)</p>
                   </div>
                   <div>
                     <p className="text-lg font-semibold text-cyan-400">{o.running}</p>
-                    <p className="text-xs text-slate-500">Orders running</p>
+                    <p className="text-xs text-[var(--muted)]">Orders running</p>
                   </div>
                 </div>
               </div>
@@ -253,20 +253,20 @@ export default async function OutletsPage({
       </div>
       {totalPages > 1 && (
         <nav className="flex items-center justify-between gap-4 flex-wrap">
-          <span className="text-slate-400 text-sm">
+          <span className="text-[var(--muted)] text-sm">
             Page {page} of {totalPages}
           </span>
           <div className="flex gap-2">
             <Link
               href={page <= 1 ? "/outlets" : `/outlets?page=${page - 1}`}
-              className="rounded-lg bg-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600 disabled:opacity-50 disabled:pointer-events-none"
+              className="rounded-xl bg-[var(--card-hover)] border border-[var(--border)] px-4 py-2 text-sm text-slate-200 hover:border-[var(--border-accent)] hover:bg-[var(--accent-glow)] transition-colors disabled:opacity-50 disabled:pointer-events-none"
               aria-disabled={page <= 1}
             >
               Previous
             </Link>
             <Link
               href={page >= totalPages ? `/outlets?page=${totalPages}` : `/outlets?page=${page + 1}`}
-              className="rounded-lg bg-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600 disabled:opacity-50 disabled:pointer-events-none"
+              className="rounded-xl bg-[var(--card-hover)] border border-[var(--border)] px-4 py-2 text-sm text-slate-200 hover:border-[var(--border-accent)] hover:bg-[var(--accent-glow)] transition-colors disabled:opacity-50 disabled:pointer-events-none"
               aria-disabled={page >= totalPages}
             >
               Next

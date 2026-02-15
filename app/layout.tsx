@@ -33,7 +33,7 @@ export default async function RootLayout({
   }
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased bg-slate-900">
+      <body className="min-h-screen antialiased bg-[var(--background)] text-[var(--foreground)] relative">
         <DashboardShell session={session} outlets={outlets}>
           {children}
         </DashboardShell>

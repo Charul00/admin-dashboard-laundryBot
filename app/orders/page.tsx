@@ -55,7 +55,7 @@ export default async function OrdersPage({
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
   if (!supabase) {
     return (
-      <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
+      <div className="card-surface border-amber-500/40 bg-amber-500/10 p-4 text-amber-200">
         <p>Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_KEY to .env.local</p>
       </div>
     );
@@ -77,7 +77,7 @@ export default async function OrdersPage({
 
   if (error) {
     return (
-      <div className="rounded-lg bg-amber-900/30 border border-amber-600/50 p-4 text-amber-200">
+      <div className="card-surface border-red-500/40 bg-red-500/10 p-4 text-red-200">
         <p>{error}</p>
       </div>
     );
@@ -87,15 +87,15 @@ export default async function OrdersPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-100">Orders</h1>
-      <p className="text-slate-400 text-sm">
+      <h1 className="text-2xl font-bold text-[var(--foreground)]">Orders</h1>
+      <p className="text-[var(--muted)] text-sm">
         {total} order{total !== 1 ? "s" : ""} total · Page {data.page} of {totalPages}
       </p>
-      <div className="rounded-xl bg-slate-800 border border-slate-700 overflow-hidden">
+      <div className="card-surface overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-slate-400 border-b border-slate-600 bg-slate-800/80">
+              <tr className="text-[var(--muted)] border-b border-[var(--border)] bg-[var(--card-hover)]/50">
                 <th className="text-left py-3 px-4">Order #</th>
                 <th className="text-left py-3 px-4">Customer</th>
                 <th className="text-left py-3 px-4">Outlet</th>
@@ -109,14 +109,14 @@ export default async function OrdersPage({
             <tbody>
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-8 text-slate-500 text-center">
+                  <td colSpan={8} className="py-8 text-[var(--muted)] text-center">
                     No orders yet
                   </td>
                 </tr>
               ) : (
                 orders.map((o) => (
-                  <tr key={o.id} className="border-b border-slate-700/50 hover:bg-slate-700/30">
-                    <td className="py-3 px-4 font-mono text-sky-400">{o.order_number}</td>
+                  <tr key={o.id} className="border-b border-[var(--border)]/50 hover:bg-[var(--card-hover)]/50 transition-colors">
+                    <td className="py-3 px-4 font-mono text-[var(--accent)]">{o.order_number}</td>
                     <td className="py-3 px-4">{o.customer_name}</td>
                     <td className="py-3 px-4">{o.outlet_name}</td>
                     <td className="py-3 px-4">
@@ -125,7 +125,7 @@ export default async function OrdersPage({
                     <td className="py-3 px-4">{o.priority_type}</td>
                     <td className="py-3 px-4 text-right">{Number(o.total_price).toFixed(2)}</td>
                     <td className="py-3 px-4">{o.payment_status ?? "—"}</td>
-                    <td className="py-3 px-4 text-slate-400">{o.created_at?.slice(0, 10)}</td>
+                    <td className="py-3 px-4 text-[var(--muted)]">{o.created_at?.slice(0, 10)}</td>
                   </tr>
                 ))
               )}
@@ -135,20 +135,20 @@ export default async function OrdersPage({
       </div>
       {totalPages > 1 && (
         <nav className="flex items-center justify-between gap-4 flex-wrap">
-          <span className="text-slate-400 text-sm">
+          <span className="text-[var(--muted)] text-sm">
             Page {data.page} of {totalPages}
           </span>
           <div className="flex gap-2">
             <Link
               href={data.page <= 1 ? "/orders" : `/orders?page=${data.page - 1}`}
-              className="rounded-lg bg-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600 disabled:opacity-50 disabled:pointer-events-none"
+              className="rounded-xl bg-[var(--card-hover)] border border-[var(--border)] px-4 py-2 text-sm text-slate-200 hover:border-[var(--border-accent)] hover:bg-[var(--accent-glow)] transition-colors disabled:opacity-50 disabled:pointer-events-none"
               aria-disabled={data.page <= 1}
             >
               Previous
             </Link>
             <Link
               href={data.page >= totalPages ? `/orders?page=${totalPages}` : `/orders?page=${data.page + 1}`}
-              className="rounded-lg bg-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600 disabled:opacity-50 disabled:pointer-events-none"
+              className="rounded-xl bg-[var(--card-hover)] border border-[var(--border)] px-4 py-2 text-sm text-slate-200 hover:border-[var(--border-accent)] hover:bg-[var(--accent-glow)] transition-colors disabled:opacity-50 disabled:pointer-events-none"
               aria-disabled={data.page >= totalPages}
             >
               Next
